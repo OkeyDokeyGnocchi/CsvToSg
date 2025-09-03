@@ -42,6 +42,7 @@ if __name__ == '__main__':
     # Set the Cloudformation header
     CFN_HEADER = textwrap.dedent(f"""\
                               AWSTemplateFormatVersion: 2010-09-09
+
                               Parameters:
                                 GroupName:
                                   Type: String
