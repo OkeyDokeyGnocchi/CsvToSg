@@ -67,16 +67,16 @@ if __name__ == '__main__':
                                         - {{ Key: Name, Value: !Ref GroupName  }}
                                  
                                 Outputs:
-                                    DeployDoc:
+                                  DeployDoc:
                                     Description: URL of the stack's deployment doc
                                     Value: {args.deploy_doc}
-                                    RepoName:
+                                  RepoName:
                                     Description: Name of the repo containing the stack's code
                                     Value: {args.repo_name}
-                                    RepoCloneUrl:
+                                  RepoCloneUrl:
                                     Description: Clone URL of the repo containig the stack's code
                                     Value: {args.repo_url}
-                                    RepoAcct:
+                                  RepoAcct:
                                     Description: Alias of the AWS account containing the repo
                                     Value: {args.repo_account}""")
 
