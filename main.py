@@ -56,7 +56,7 @@ if __name__ == '__main__':
                                         {args.service_name}SG:
                                           Type: AWS::EC2::SecurityGroup
                                           Properties:
-                                            GroupDescription: {args.service_name} Security Group
+                                            GroupDescription: \"{args.service_name} Security Group\"
                                             GroupName: !Ref GroupName
                                             VpcId: !ImportValue Network-ItsVpc::VPC
                                             SecurityGroupIngress:
