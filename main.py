@@ -10,7 +10,7 @@ def create_rules(csv_file):
         for row in reader:
             rule_entry = f"""\
       - IpProtocol: {row["Protocol"]}
-        Description: {row["Description"]}
+        Description: \"{row["Description"]}\"
         FromPort: {row["FromPort"]}
         ToPort: {row["ToPort"]}
         CidrIp: {row["CidrIp"]}
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                                         {args.service_name}SG:
                                           Type: AWS::EC2::SecurityGroup
                                           Properties:
-                                            GroupDescription: \"{args.service_name} Security Group\"
+                                            GroupDescription: {args.service_name} Security Group
                                             GroupName: !Ref GroupName
                                             VpcId: !ImportValue Network-ItsVpc::VPC
                                             SecurityGroupIngress:
