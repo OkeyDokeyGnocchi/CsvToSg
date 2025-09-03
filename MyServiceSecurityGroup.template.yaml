@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  GroupName:
+    Type: String
+    Default: "MyService"
+
+Resources:
+  MyServiceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: MyService Security Group
+      GroupName: !Ref GroupName
+      VpcId: !ImportValue Network-ItsVpc::VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        Description: I am the first rule
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 129.65.0.0/16
+      - IpProtocol: tcp
+        Description: I am the second rule
+        FromPort: 27000
+        ToPort: 27009
+        CidrIp: 129.65.0.0/16
+      - IpProtocol: tcp
+        Description: I am the third rule
+        FromPort: 27000
+        ToPort: 27009
+        CidrIp: 10.149.0.0/22
+      Tags:
+        - { Key: Name, Value: !Ref GroupName  }
+
+Outputs:
+    DeployDoc:
+    Description: URL of the stack's deployment doc
+    Value: https://wiki.wiki
+    RepoName:
+    Description: Name of the repo containing the stack's code
+    Value: RepoName
+    RepoCloneUrl:
+    Description: Clone URL of the repo containig the stack's code
+    Value: htts://codecommit.code
+    RepoAcct:
+    Description: Alias of the AWS account containing the repo
+    Value: cptest-dev

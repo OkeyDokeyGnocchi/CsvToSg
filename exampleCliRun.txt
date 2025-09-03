@@ -1,0 +1,1 @@
+python .\main.py --service-name MyService --deploy-doc https://wiki.wiki --repo-name RepoName --repo-url htts://codecommit.code --repo-account cptest-dev
