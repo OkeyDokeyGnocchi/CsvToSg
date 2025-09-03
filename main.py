@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # Set the Cloudformation , incl. the Tags section
     CFN_FOOTER = textwrap.dedent(f"""\
                                       Tags:
-                                        - {{ Key: Name, Value: !Ref GroupName  }}
+                                        - {{ Key: Name, Value: !Ref GroupName }}
                                  
                                 Outputs:
                                   DeployDoc:
