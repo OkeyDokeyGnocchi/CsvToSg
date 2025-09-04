@@ -1,23 +1,39 @@
 import argparse
 import csv
 import os
+import re
 import textwrap
 
-def create_rules(csv_file):
-    rules = ""
+def create_rules(csv_file, CFN_HEADER):
+    # Create our rules for the CFN template by looping through our input csv file
+    cfn_rules = ""
+    header_parameters = ""
     with open(csv_file) as f:
         reader = csv.DictReader(f)
         for row in reader:
-            rule_entry = f"""\
+            if re.search('[a-zA-Z]', row["CidrIp"]):
+                cidr_format = False
+                while cidr_format == False:
+                  param_cidr = input(f"What is the CIDR IP for {row['CidrIp']}: ")
+                  if not re.search('([0-9]{1,3}\.){3}[0-9]{1,3}(\\[0-3][0-9])', param_cidr):
+                      print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16")
+                  else:
+                    header_parameters += f"""\
+  {row['CidrIp']}:
+      Type: String
+      Default: {param_cidr}
+"""
+            else:
+                rule_entry = f"""\
       - IpProtocol: {row["Protocol"]}
         Description: \"{row["Description"]}\"
         FromPort: {row["FromPort"]}
         ToPort: {row["ToPort"]}
         CidrIp: {row["CidrIp"]}
 """
-            rules += rule_entry
+            cfn_rules += rule_entry
     
-    return rules
+    return cfn_rules, header_parameters
 
 if __name__ == '__main__':
 
@@ -32,6 +48,7 @@ if __name__ == '__main__':
     parser.add_argument("--repo-name", help = "Name of the code repository")
     parser.add_argument("--repo-url", help = "URL for the code repository")
     parser.add_argument("--repo-account", help = "AWS account that the repository is in")
+    parser.add_argument("--csv-file", help="The input csv file to generate rules from")
     args=parser.parse_args()
 
     # If any of the args are missing, ask the user for the values
@@ -47,7 +64,6 @@ if __name__ == '__main__':
                                 GroupName:
                                   Type: String
                                   Default: \"{args.service_name}\"
-                                  
                                   """)
 
     # Set the Resources block starter
@@ -81,9 +97,10 @@ if __name__ == '__main__':
                                     Description: Alias of the AWS account containing the repo
                                     Value: {args.repo_account}""")
 
-    sg_rules = create_rules('example.csv')
-    resources_block += sg_rules
-    template = CFN_HEADER + resources_block + CFN_FOOTER
+    sg_rules = create_rules(args.csv_file, CFN_HEADER)
+    resources_block += sg_rules[0]
+    CFN_HEADER += sg_rules[1]
+    template = CFN_HEADER + "\n" + resources_block + CFN_FOOTER
     with open(working_directory + args.service_name + "SecurityGroup.template.yaml", "w") as f:
         f.write(template)
     
