@@ -4,6 +4,8 @@ import os
 import re
 import textwrap
 
+# TODO: need to add generation for the tags file
+
 def create_rules(csv_file, CFN_HEADER):
     # Create our rules for the CFN template by looping through our input csv file
     cfn_rules = ""
@@ -11,13 +13,17 @@ def create_rules(csv_file, CFN_HEADER):
     with open(csv_file) as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # Check if the row's CidrIp column contains letters
+            # This would generally mean that this will be a parameter for human-readability
             if re.search('[a-zA-Z]', row["CidrIp"]):
                 cidr_format = False
                 while cidr_format == False:
+                  # If this appears to be a non-CIDR, ask user for the CIDR so we can set the parameter
                   param_cidr = input(f"What is the CIDR IP for {row['CidrIp']}: ")
                   if not re.search('([0-9]{1,3}\.){3}[0-9]{1,3}(\\[0-3][0-9])', param_cidr):
                       print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16")
                   else:
+                    # If non-CIDR we need to create the parameter(s) up in the header
                     header_parameters += f"""\
   {row['CidrIp']}:
       Type: String
@@ -98,9 +104,15 @@ if __name__ == '__main__':
                                     Value: {args.repo_account}""")
 
     sg_rules = create_rules(args.csv_file, CFN_HEADER)
+
+    # Add our generated rules to the resources block and parameters to the header
     resources_block += sg_rules[0]
     CFN_HEADER += sg_rules[1]
+
+    # Build our template
     template = CFN_HEADER + "\n" + resources_block + CFN_FOOTER
+
+    # Save the template
     with open(working_directory + args.service_name + "SecurityGroup.template.yaml", "w") as f:
         f.write(template)
     
