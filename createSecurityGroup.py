@@ -5,8 +5,6 @@ import os
 import re
 import textwrap
 
-# TODO: need to add generation for the tags file
-
 def create_rules(csv_file):
     # Create our rules for the CFN template by looping through our input csv file
     cfn_rules = ""
@@ -22,7 +20,7 @@ def create_rules(csv_file):
                   # If this appears to be a non-CIDR, ask user for the CIDR so we can set the parameter
                   param_cidr = input(f"What is the CIDR IP for {row['CidrIp']}: ")
                   if not validate_cidr(param_cidr):
-                      print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16")
+                      print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16\n")
                   else:
                     # If non-CIDR we need to create the parameter(s) up in the header
                     header_parameters += f"""\
@@ -33,8 +31,8 @@ def create_rules(csv_file):
                     rule_entry = f"""\
         - IpProtocol: {row["Protocol"]}
           Description: \"{row["Description"]}\"
-          FromPort: {row["FromPort"]}
-          ToPort: {row["ToPort"]}
+          FromPort: {row["StartingPort"]}
+          ToPort: {row["EndingPort"]}
           CidrIp: !Ref {row["CidrIp"]}
 """
                     break
@@ -42,8 +40,8 @@ def create_rules(csv_file):
                 rule_entry = f"""\
         - IpProtocol: {row["Protocol"]}
           Description: \"{row["Description"]}\"
-          FromPort: {row["FromPort"]}
-          ToPort: {row["ToPort"]}
+          FromPort: {row["StartingPort"]}
+          ToPort: {row["EndingPort"]}
           CidrIp: {row["CidrIp"]}
 """
             cfn_rules += rule_entry
@@ -120,6 +118,23 @@ if __name__ == '__main__':
                                   RepoAcct:
                                     Description: Alias of the AWS account containing the repo
                                     Value: {args.repo_account}""")
+    
+    TAGS_FILE = textwrap.dedent(f"""\
+                                Tags:
+                                - Key: BillFund
+                                  Value: <ChangeMe>
+                                - Key: BillDeptId
+                                  Value: <ChangeMe>
+                                - Key: BillAccount
+                                  Value: <ChangeMe>
+                                - Key: PrimaryContact
+                                  Value: <ChangeMe>
+                                - Key: DataClassification
+                                  Value: <ChangeMe>
+                                - Key: ServiceName
+                                  Value: {args.service_name}
+                                - Key: ServiceComponent
+                                  Value: <ChangeMe>""")
 
     sg_rules = create_rules(args.csv_file)
 
@@ -133,5 +148,11 @@ if __name__ == '__main__':
     # Save the template
     with open(working_directory + args.service_name + "SecurityGroup.template.yaml", "w") as f:
         f.write(template)
+
+    # Save the tags file
+    with open(working_directory + args.service_name + "SecurityGroup.tags.yaml", "w") as f:
+        f.write(TAGS_FILE)
     
-    print(f"\nTemplate generated as {args.service_name}SecurityGroup.template.yaml. Exiting.")
+    print(f"\nTemplate generated as {args.service_name}SecurityGroup.template.yaml.")
+    print(f"Tags file generated as {args.service_name}SecurityGroup.tags.yaml.")
+    print(f"\n##NOTE: Please be sure to put the correct values in for the tags before uploading! Exiting.")

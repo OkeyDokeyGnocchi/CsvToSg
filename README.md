@@ -4,7 +4,7 @@
 
 ### Csv example
 ```
-DisplayName,Description,Action,Direction,FromPort,ToPort,Protocol,CidrIp
+DisplayName,Description,Action,Direction,StartingPort,EndingPort,Protocol,CidrIp
 Rule1,I am the first rule,Allow,Inbound,80,80,tcp,129.65.0.0/16
 Rule2,I am the second rule,Allow,Inbound,27000,27009,tcp,129.65.0.0/16
 ```
