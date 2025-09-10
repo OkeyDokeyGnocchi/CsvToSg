@@ -23,6 +23,7 @@ def create_rules(csv_file):
                       print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16\n")
                   else:
                     # If non-CIDR we need to create the parameter(s) up in the header
+                    cidr_format = True
                     header_parameters += f"""\
   {row['CidrIp']}:
     Type: String
@@ -35,7 +36,6 @@ def create_rules(csv_file):
           ToPort: {row["EndingPort"]}
           CidrIp: !Ref {row["CidrIp"]}
 """
-                    break
             else:
                 rule_entry = f"""\
         - IpProtocol: {row["Protocol"]}
