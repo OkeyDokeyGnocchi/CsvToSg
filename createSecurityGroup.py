@@ -1,12 +1,13 @@
 import argparse
 import csv
+import ipaddress
 import os
 import re
 import textwrap
 
 # TODO: need to add generation for the tags file
 
-def create_rules(csv_file, CFN_HEADER):
+def create_rules(csv_file):
     # Create our rules for the CFN template by looping through our input csv file
     cfn_rules = ""
     header_parameters = ""
@@ -20,30 +21,47 @@ def create_rules(csv_file, CFN_HEADER):
                 while cidr_format == False:
                   # If this appears to be a non-CIDR, ask user for the CIDR so we can set the parameter
                   param_cidr = input(f"What is the CIDR IP for {row['CidrIp']}: ")
-                  if not re.search('([0-9]{1,3}\.){3}[0-9]{1,3}(\\[0-3][0-9])', param_cidr):
+                  if not validate_cidr(param_cidr):
                       print("IP range MUST be in CIDR format. e.g., 129.65.0.0/16")
                   else:
                     # If non-CIDR we need to create the parameter(s) up in the header
                     header_parameters += f"""\
   {row['CidrIp']}:
-      Type: String
-      Default: {param_cidr}
+    Type: String
+    Default: {param_cidr}
 """
+                    rule_entry = f"""\
+        - IpProtocol: {row["Protocol"]}
+          Description: \"{row["Description"]}\"
+          FromPort: {row["FromPort"]}
+          ToPort: {row["ToPort"]}
+          CidrIp: !Ref {row["CidrIp"]}
+"""
+                    break
             else:
                 rule_entry = f"""\
-      - IpProtocol: {row["Protocol"]}
-        Description: \"{row["Description"]}\"
-        FromPort: {row["FromPort"]}
-        ToPort: {row["ToPort"]}
-        CidrIp: {row["CidrIp"]}
+        - IpProtocol: {row["Protocol"]}
+          Description: \"{row["Description"]}\"
+          FromPort: {row["FromPort"]}
+          ToPort: {row["ToPort"]}
+          CidrIp: {row["CidrIp"]}
 """
             cfn_rules += rule_entry
     
     return cfn_rules, header_parameters
 
+def validate_cidr(cidr_input):
+    try:
+        ipaddress.ip_network(cidr_input)
+        return True
+    except:
+        return False
+
 if __name__ == '__main__':
 
     working_directory = os.path.dirname(os.path.abspath(__file__)) + "/"
+
+    print()
 
     # Set up the argument parser
     parser = argparse.ArgumentParser()
@@ -103,7 +121,7 @@ if __name__ == '__main__':
                                     Description: Alias of the AWS account containing the repo
                                     Value: {args.repo_account}""")
 
-    sg_rules = create_rules(args.csv_file, CFN_HEADER)
+    sg_rules = create_rules(args.csv_file)
 
     # Add our generated rules to the resources block and parameters to the header
     resources_block += sg_rules[0]
