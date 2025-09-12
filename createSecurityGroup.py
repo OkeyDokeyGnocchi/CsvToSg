@@ -65,12 +65,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # Add our command line arguments to the parser
-    parser.add_argument("--service-name", help="Service name")
+    parser.add_argument("--service-name", help = "Service name")
     parser.add_argument("--deploy-doc", help = "URL for the deploy doc")
     parser.add_argument("--repo-name", help = "Name of the code repository")
     parser.add_argument("--repo-url", help = "URL for the code repository")
     parser.add_argument("--repo-account", help = "AWS account that the repository is in")
-    parser.add_argument("--csv-file", help="The input csv file to generate rules from")
+    parser.add_argument("--csv-file", help = "The input csv file to generate rules from")
     args=parser.parse_args()
 
     # If any of the args are missing, ask the user for the values
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # Set the Resources block starter
     resources_block = textwrap.dedent(f"""\
                                       Resources:
-                                        {args.service_name}SG:
+                                        SecurityGroup:
                                           Type: AWS::EC2::SecurityGroup
                                           Properties:
                                             GroupDescription: {args.service_name} Security Group
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     # Save the tags file
     with open(working_directory + args.service_name + "SecurityGroup.tags.yaml", "w") as f:
         f.write(TAGS_FILE)
-    
+
     print(f"\nTemplate generated as {args.service_name}SecurityGroup.template.yaml.")
     print(f"Tags file generated as {args.service_name}SecurityGroup.tags.yaml.")
-    print(f"\n##NOTE: Please be sure to put the correct values in for the tags before uploading! Exiting.")
+    print(f"\n##NOTE: Please be sure to put the correct values in for the tags before running CloudFormation cli! Exiting.")
