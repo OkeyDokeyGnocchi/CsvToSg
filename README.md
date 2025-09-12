@@ -4,9 +4,12 @@
 
 ### Csv example
 ```
-DisplayName,Description,Action,Direction,StartingPort,EndingPort,Protocol,CidrIp
-Rule1,I am the first rule,Allow,Inbound,80,80,tcp,129.65.0.0/16
-Rule2,I am the second rule,Allow,Inbound,27000,27009,tcp,129.65.0.0/16
+Action,Direction,StartingPort,EndingPort,Protocol,CidrIp,DisplayName,Description
+Allow,Inbound,80,80,tcp,129.65.0.0/16,Rule1,I am the first rule
+Allow,Inbound,443,443,tcp,129.65.0.0/16,Rule2,I am the second rule
+Allow,Inbound,27000,27009,tcp,10.149.0.0/22,Rule3,I am the third rule
+Allow,Inbound,27000,27009,tcp,129.65.10.0/24,Rule4,I am the fourth rule
+Allow,Inbound,27000,27009,tcp,129.65.0.0/16,OnPremFlexAccess,Allow campus to access FlexNet Ports
 ```
 
 ### Example CLI run

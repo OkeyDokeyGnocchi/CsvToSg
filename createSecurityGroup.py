@@ -14,6 +14,7 @@ def create_rules(csv_file):
         for row in reader:
             # Check if the row's CidrIp column contains letters
             # This would generally mean that this will be a parameter for human-readability
+            # NOTE: For the October deadline we aren't supporting parameters
             if re.search('[a-zA-Z]', row["CidrIp"]):
                 cidr_format = False
                 while cidr_format == False:
@@ -45,10 +46,12 @@ def create_rules(csv_file):
           CidrIp: {row["CidrIp"]}
 """
             cfn_rules += rule_entry
-    
+
     return cfn_rules, header_parameters
 
 def validate_cidr(cidr_input):
+    # This function validates that a given input is actually a cidr
+    # If it doesn't, it throws an exception we can catch
     try:
         ipaddress.ip_network(cidr_input)
         return True
@@ -77,7 +80,7 @@ if __name__ == '__main__':
     for arg in args.__dict__:
         if args.__dict__[arg] is None:
             setattr(args, arg, input(f"Please enter the value for {arg}: "))
-    
+
     # Set the Cloudformation header
     CFN_HEADER = textwrap.dedent(f"""\
                               AWSTemplateFormatVersion: \"2010-09-09\"
@@ -118,7 +121,7 @@ if __name__ == '__main__':
                                   RepoAcct:
                                     Description: Alias of the AWS account containing the repo
                                     Value: {args.repo_account}""")
-    
+
     TAGS_FILE = textwrap.dedent(f"""\
                                 Tags:
                                 - Key: BillFund
