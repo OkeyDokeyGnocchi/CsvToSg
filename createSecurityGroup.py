@@ -35,9 +35,6 @@ def create_rules(csv_file):
           FromPort: {row["StartingPort"]}
           ToPort: {row["EndingPort"]}
           CidrIp: !Ref {row["CidrIp"]}
-          Tags:
-            - Key: "Name"
-              Value: {row["DisplayName"]}
 """
             else:
                 rule_entry = f"""\
@@ -46,9 +43,6 @@ def create_rules(csv_file):
           FromPort: {row["StartingPort"]}
           ToPort: {row["EndingPort"]}
           CidrIp: {row["CidrIp"]}
-          Tags:
-            - Key: "Name"
-              Value: {row["DisplayName"]}
 """
             cfn_rules += rule_entry
     
