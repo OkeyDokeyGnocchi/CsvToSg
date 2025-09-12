@@ -12,13 +12,6 @@ def create_rules(csv_file):
     with open(csv_file) as f:
         reader = csv.DictReader(f)
         for row in reader:
-            # Check if user has set DnsName to true to know it's DNS
-            # If empty, it throws an AttributeError, so except that
-            try:
-              if row["DnsName?"].lower() in ["true", "yes"]:
-                  print(f"This is a DNS Name! {row}")
-            except AttributeError:
-                pass
             # Check if the row's CidrIp column contains letters
             # This would generally mean that this will be a parameter for human-readability
             if re.search('[a-zA-Z]', row["CidrIp"]):
